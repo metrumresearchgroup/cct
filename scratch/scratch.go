@@ -3,10 +3,29 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"os"
+
+	"github.com/metrumresearchgroup/cct/cc"
 )
 
 func main() {
-	fmt.Println("can test stuff here")
+	commitMsg := `feat: implemented cool stuff
+
+some body text
+
+some more body text
+
+References #12
+Closes #13`
+	commitMsg = `bad message
+no good
+`
+	msg, err := cc.NewCommitMessage(commitMsg)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	PrettyPrint(msg)
 }
 
 // PrettyPrint allows pretty printing of datastructures to the consol
