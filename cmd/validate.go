@@ -15,6 +15,11 @@
 package cmd
 
 import (
+	"fmt"
+	"io/ioutil"
+	"os"
+
+	"github.com/metrumresearchgroup/cct/cc"
 	"github.com/spf13/cobra"
 )
 
@@ -29,8 +34,22 @@ var validateCmd = &cobra.Command{
 	RunE: rValidate,
 }
 
-func rValidate(cmd *cobra.Command, args []string) error {
+// without using commit-file
+// cct validate path/to/file
 
+// cct validate --commit-file=path/to/file
+func rValidate(cmd *cobra.Command, args []string) error {
+	// args[0] should be the path to the commit message file
+	dat, err := ioutil.ReadFile(commitFile)
+	if err != nil {
+		panic(err)
+	}
+	commitMsg := string(dat)
+	_, err = cc.NewCommitMessage(commitMsg)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 	return nil
 }
 
