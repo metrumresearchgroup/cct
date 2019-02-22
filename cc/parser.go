@@ -6,6 +6,15 @@ import (
 	"strings"
 )
 
+
+//List of approved tags
+var ValidTags []string = []string{
+	"wip",
+	"add",
+	"doc",
+	"fix",
+}
+
 // NewCommitMessage creates a new commit message from a string
 func NewCommitMessage(s string) (CommitMessage, error) {
 	var cm CommitMessage
@@ -29,4 +38,21 @@ func NewCommitMessage(s string) (CommitMessage, error) {
 
 	// do stuff with rest for body and footer
 	return cm, nil
+}
+
+//Function to check that a tag is in the list of approved tags.
+func HasValidTag(cm CommitMessage) (bool, error) {
+	commitType := cm.Type
+	found := false
+	var err error = nil
+	for _, item := range ValidTags {
+		if commitType == item {
+			found = true
+			break
+		}
+	}
+	if !found {
+		err = errors.New(fmt.Sprintf("Invalid commit type: %s", commitType))
+	}
+	return found, err
 }
