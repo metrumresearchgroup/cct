@@ -29,25 +29,47 @@ func NewCommitMessage(s string) (CommitMessage, error) {
 
 func ParseCommitMessage(s string) (CommitMessage, error) {
 	var cm CommitMessage
-	sa := strings.Split(s, "\n")
-	if len(sa) > 1 {
-		// TODO: fix
-		// this is wrong/incomplete but was used for demonstration
-		cm.Body = sa[1:]
-		cm.Footer = []string{sa[len(sa)-1]}
-	}
-	// get the first line
-	head := strings.SplitN(sa[0], ":", 2)
-	if len(head) != 2 {
-		cm.Type = "MISSING"
-		cm.Description = sa[0]
-		return cm, errors.New(fmt.Sprintf("invalid header %s", sa[0]))
-	}
-	cm.Type = head[0]
-	cm.Description = head[1]
-	// parse out the two elements of the first line
+	var header string
+	var commitType string
+	var description string
+	var body []string = []string{}
+	var footer []string = []string{}
 
-	// do stuff with rest for body and footer
+	sections := strings.Split(s, "\n\n")
+
+	if len(sections) > 0 {
+		header = sections[0]
+	} else {
+		return cm, errors.New("no commit message supplied")
+	}
+
+	splitHeader := strings.SplitN(header, ":", 2)
+	if len(splitHeader) != 2 {
+		return cm, errors.New("header must be of the form <type>: <description>")
+	} else {
+		commitType = splitHeader[0]
+		description = splitHeader[1]
+	}
+
+	if len(sections) > 1 {
+		body = strings.Split(sections[1], "\n")
+		for index, element := range(body) {
+			body[index] = strings.TrimSpace(element)
+		}
+	}
+
+	if len(sections) > 2 {
+		footer = strings.Split(sections[2], "\n")
+		for index, element := range(footer) {
+			footer[index] = strings.TrimSpace(element)
+		}
+	}
+
+	cm.Type = strings.TrimSpace(commitType)
+	cm.Description = strings.TrimSpace(description)
+	cm.Body = body
+	cm.Footer = footer
+
 	return cm, nil
 }
 

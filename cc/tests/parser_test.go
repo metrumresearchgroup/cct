@@ -248,3 +248,35 @@ this is a body2
 		t.Fail()
 	}
 }
+
+func TestParseCommitMessage_EmptyType(t *testing.T) {
+	messageRaw :=
+		`: this is a description.
+
+this is a body1
+this is a body2
+
+this is a footer1
+this is a footer2`
+
+	_, err := cc.ParseCommitMessage(messageRaw)
+	if err != nil {
+		t.Fail()
+	}
+}
+
+func TestParseCommitMessage_NoType(t *testing.T) {
+	messageRaw :=
+		`this is a description.
+
+this is a body1
+this is a body2
+
+this is a footer1
+this is a footer2`
+
+	_, err := cc.ParseCommitMessage(messageRaw)
+	if err != nil {
+		t.Fail()
+	}
+}
