@@ -32,8 +32,8 @@ func ParseCommitMessage(s string) (CommitMessage, error) {
 	var header string
 	var commitType string
 	var description string
-	var body []string = []string{}
-	var footer []string = []string{}
+	var body []string
+	var footer []string
 
 	sections := strings.Split(s, "\n\n")
 
@@ -49,12 +49,16 @@ func ParseCommitMessage(s string) (CommitMessage, error) {
 	} else {
 		commitType = splitHeader[0]
 		description = splitHeader[1]
+		if len(strings.Split(description, "\n")) > 1 {
+			return cm, errors.New("description must be a single-line")
+		}
 	}
 
 	if len(sections) > 1 {
 		body = strings.Split(sections[1], "\n")
-		for index, element := range(body) {
-			body[index] = strings.TrimSpace(element)
+		if body[0] == "" {
+			footer = body
+			body = []string{}
 		}
 	}
 
@@ -67,8 +71,8 @@ func ParseCommitMessage(s string) (CommitMessage, error) {
 
 	cm.Type = strings.TrimSpace(commitType)
 	cm.Description = strings.TrimSpace(description)
-	cm.Body = body
-	cm.Footer = footer
+	cm.Body = pruneWhiteSpace(body)
+	cm.Footer = pruneWhiteSpace(footer)
 
 	return cm, nil
 }
@@ -84,4 +88,17 @@ func HasValidTag(cm CommitMessage) bool {
 		}
 	}
 	return found
+}
+
+func pruneWhiteSpace(stringList []string) ([]string) {
+	var returnList []string = []string{}
+	for _, element := range(stringList) {
+		if strings.TrimSpace(element) != "" {
+			returnList = append(returnList, strings.TrimSpace(element))
+		}
+	}
+	if returnList == nil {
+		returnList = []string { }
+	}
+	return returnList
 }

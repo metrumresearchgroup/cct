@@ -48,19 +48,6 @@ func TestHasValidTag_EmptyTagIsRejected(t *testing.T) {
 	}
 }
 
-func TestHasValidTag_NilTagRejected(t *testing.T) {
-	t.Skip()
-	cm := cc.CommitMessage {
-		//Type:  nil,
-		Body: []string{ "This is a body" },
-		Footer: []string{ "This is a footer"},
-		Description: "This is a description.",
-	}
-	result := cc.HasValidTag(cm)
-	if(result == true) {
-		t.Fail()
-	}
-}
 
 func utilityCommitMessageEqual(cm1, cm2 cc.CommitMessage) bool {
 
@@ -92,10 +79,12 @@ func utilityCommitMessageEqual(cm1, cm2 cc.CommitMessage) bool {
 }
 
 func TestParseCommitMessage_SimpleMessage(t *testing.T) {
-	messageRaw := "fix: this is a valid message."
+	messageRaw := "fix: this is a valid message"
 	expected := cc.CommitMessage{
 		Type:        "fix",
 		Description: "this is a valid message",
+		//Body: []string{},
+		//Footer: []string{},
 	}
 	actual, err := cc.ParseCommitMessage(messageRaw)
 	if ( !utilityCommitMessageEqual(expected, actual)) || err != nil {
@@ -105,7 +94,7 @@ func TestParseCommitMessage_SimpleMessage(t *testing.T) {
 
 func TestParseCommitMessage_FullMessage(t *testing.T) {
 	messageRaw :=
-`fix: this is a description.
+`fix: this is a description
 
 this is a body1
 this is a body2
@@ -115,7 +104,7 @@ this is a footer2`
 
 	expected := cc.CommitMessage {
 		Type:  "fix",
-		Description: "this is a description.",
+		Description: "this is a description",
 		Body: []string{ "this is a body1", "this is a body2" },
 		Footer: []string{ "this is a footer1", "this is a footer2"},
 	}
@@ -127,7 +116,7 @@ this is a footer2`
 
 func TestParseCommitMessage_ExtraDescriptionFails(t *testing.T) {
 	messageRaw :=
-		`fix: this is a description1.
+		`fix: this is a description1
 this is a description2
 
 this is a body1
@@ -143,7 +132,7 @@ this is a footer2`
 
 func TestParseCommitMessage_ExtraTypeIsTreatedAsDescription(t *testing.T) {
 	messageRaw :=
-`fix: add: this is a description.
+`fix: add: this is a description
 
 this is a body1
 this is a body2
@@ -153,7 +142,7 @@ this is a footer2`
 
 	expected := cc.CommitMessage {
 		Type:  "fix",
-		Description: "add: this is a description.",
+		Description: "add: this is a description",
 		Body: []string{ "this is a body1", "this is a body2" },
 		Footer: []string{ "this is a footer1", "this is a footer2"},
 	}
@@ -165,7 +154,7 @@ this is a footer2`
 
 func TestParseCommitMessage_NoBodyStillAllowsFooter(t *testing.T) {
 	messageRaw :=
-		`fix: add: this is a description.
+		`fix: add: this is a description
 
 
 this is a footer1
@@ -173,7 +162,7 @@ this is a footer2`
 
 	expected := cc.CommitMessage {
 		Type:  "fix",
-		Description: "add: this is a description.",
+		Description: "add: this is a description",
 		Body: []string{},
 		Footer: []string{ "this is a footer1", "this is a footer2"},
 	}
@@ -204,7 +193,7 @@ this is a body2`
 
 func TestParseCommitMessage_BlankLinesIgnored(t *testing.T) {
 	messageRaw :=
-		`fix: add: this is a description.
+		`fix: add: this is a description
 
 this is a body1
 this is a body2
@@ -216,7 +205,7 @@ this is a footer2
 
 	expected := cc.CommitMessage {
 		Type:  "fix",
-		Description: "add: this is a description.",
+		Description: "add: this is a description",
 		Body: []string{ "this is a body1", "this is a body2" },
 		Footer: []string{ "this is a footer1", "this is a footer2"},
 	}
@@ -228,7 +217,7 @@ this is a footer2
 
 func TestParseCommitMessage_BlankLinesIgnoredNoFooter(t *testing.T) {
 	messageRaw :=
-		`fix: add: this is a description.
+		`fix: add: this is a description
 
 this is a body1
 this is a body2
@@ -239,7 +228,7 @@ this is a body2
 
 	expected := cc.CommitMessage {
 		Type:  "fix",
-		Description: "add: this is a description.",
+		Description: "add: this is a description",
 		Body: []string{ "this is a body1", "this is a body2" },
 		Footer: []string{ },
 	}
@@ -267,7 +256,7 @@ this is a footer2`
 
 func TestParseCommitMessage_NoType(t *testing.T) {
 	messageRaw :=
-		`this is a description.
+		`this is a description
 
 this is a body1
 this is a body2
@@ -276,7 +265,7 @@ this is a footer1
 this is a footer2`
 
 	_, err := cc.ParseCommitMessage(messageRaw)
-	if err != nil {
+	if err == nil {
 		t.Fail()
 	}
 }
