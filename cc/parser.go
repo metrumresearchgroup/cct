@@ -7,6 +7,7 @@ import (
 )
 
 
+//Todo: Set valid tags in init code.
 //List of approved tags
 var ValidTags []string = []string{
 	"wip",

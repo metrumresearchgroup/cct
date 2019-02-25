@@ -3,9 +3,10 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/metrumresearchgroup/cct/cc"
 	"os"
 
-	"github.com/metrumresearchgroup/cct/cc"
+	"github.com/spf13/cobra"
 )
 
 func main() {
@@ -20,6 +21,17 @@ Closes #13`
 	commitMsg = `bad message
 no good
 `
+	// RootCmd represents the base command when called without any subcommands
+	var RootCmd = &cobra.Command{
+		Use:   "cct",
+		Short: "conventional commits",
+		Long:  fmt.Sprintf("cct cli version %s", 5),
+	}
+
+	fmt.Println(RootCmd.Use)
+
+	RootCmd.Execute()
+
 	msg, err := cc.NewCommitMessage(commitMsg)
 	if err != nil {
 		fmt.Println(err)
