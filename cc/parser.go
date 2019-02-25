@@ -18,6 +18,16 @@ var ValidTags []string = []string{
 
 // NewCommitMessage creates a new commit message from a string
 func NewCommitMessage(s string) (CommitMessage, error) {
+	message, err := ParseCommitMessage(s)
+	if err != nil {
+		if !HasValidTag(message) {
+			err = errors.New(fmt.Sprintf("unrecognized commit type: %s", message.Type))
+		}
+	}
+	return message, err
+}
+
+func ParseCommitMessage(s string) (CommitMessage, error) {
 	var cm CommitMessage
 	sa := strings.Split(s, "\n")
 	if len(sa) > 1 {
@@ -42,18 +52,14 @@ func NewCommitMessage(s string) (CommitMessage, error) {
 }
 
 //Function to check that a tag is in the list of approved tags.
-func HasValidTag(cm CommitMessage) (bool, error) {
+func HasValidTag(cm CommitMessage) bool {
 	commitType := cm.Type
 	found := false
-	var err error = nil
 	for _, item := range ValidTags {
 		if commitType == item {
 			found = true
 			break
 		}
 	}
-	if !found {
-		err = errors.New(fmt.Sprintf("Invalid commit type: %s", commitType))
-	}
-	return found, err
+	return found
 }
